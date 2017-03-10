@@ -1,0 +1,80 @@
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include<cstring>
+using namespace std;
+
+int q,p,m,n,r;
+int rp[30][13];
+int cost[13];
+int rpvalue[30];
+int dp[8200];
+int calculate(int bitmasks);
+
+int main() {
+    int q;
+	cin>>q;
+	while(q-->0){
+	
+		cin>>r>>p>>n>>m;
+		int x,y,z,bitmasks=0;
+		for(int i = 1 ; i<=m ; i++){
+			cin>>x;
+			bitmasks|=(1<<p-x-1);
+		}
+		for(int i = p-1 ; i>=0 ; i--){
+			cin>>cost[i];
+		}
+		for(int i = 0 ; i< r; i++){
+			y=pow(2,p-1);
+			int sum=0;
+			for(int j = p-1 ; j>=0 ; j--){
+				cin>>rp[i][j];
+				sum+=(rp[i][j])*y;
+				y=y>>1;
+			}
+			rpvalue[i]=sum;
+		}
+		
+		memset(dp,-1,sizeof(dp));
+		cout<<calculate(bitmasks)<<endl;
+	}  
+	
+    return 0;
+}
+
+int calculate(int bitmasks){
+	if(dp[bitmasks]!=-1)
+	return dp[bitmasks];
+	
+	int count=0;
+	for(int i = 0 ; i < r ; i++){
+		int flag=0;
+		for(int j = 0 ; j <p ; j++){
+			if(( ((bitmasks >> j) & 1 )==0 && ((rpvalue[i] >> j) & 1 )==0) || ((bitmasks >> j) & 1 )==1)
+			flag++;
+			else
+			{
+				break;
+			}
+		}
+		if(flag==p)
+		count++;
+	}
+	if(count>=n)
+	return dp[bitmasks]=0;
+	
+	long long int minimum=9999999;
+	for(int i = 0 ; i<p ; i++){
+		long long int local=0;
+		if(((bitmasks >> i) & 1)==0){
+			local=cost[i]+calculate(bitmasks|(1<<i));
+			minimum=min(local,minimum);
+		}
+	}
+	
+	return dp[bitmasks]=minimum;
+	
+}
