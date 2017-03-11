@@ -1,0 +1,119 @@
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <map>
+#include<cstring>
+#include <algorithm>
+using namespace std;
+#define red 0
+#define green 1
+#define blue 2
+#define mod 1000000007
+
+int n,RB,RG,BR,BG,GR,GB;
+int dp[100000][3][10][2][10][2][2][2];
+
+
+struct des{
+	int i;
+	int c;
+	int _rb;
+	int _rg;
+	int _br;
+	int _bg;
+	int _gr;
+	int _gb;
+};
+
+bool operator<(const des& n1, const des& n2) {
+    if(n1.i >n2.i)
+    return false;
+    else if(n1.i < n2.i)
+    return true;
+    else if(n1.c < n2.c)
+    return true;
+    else if(n1.c>n2.c)
+    return false;
+    else if(n1._rb > n2._rb)
+    return false;
+        else if(n1._rb < n2._rb)
+    return true;
+        else if(n1._rg > n2._rg)
+    return false;
+            else if(n1._rg < n2._rg)
+    return true;
+        else if(n1._br > n2._br)
+    return false;
+            else if(n1._br < n2._br)
+    return true;
+        else if(n1._bg > n2._bg)
+    return false;
+        else if(n1._bg < n2._bg)
+    return true;
+        else if(n1._gr > n2._gr)
+    return false;
+        else if(n1._gr < n2._gr)
+    return true;
+    else if(n1._gb > n2._gb)
+    return false;
+        else if(n1._gb < n2._gb)
+    return true;
+    return true;
+}
+
+
+
+int calculate(int index,int color,int rb,int rg,int br,int bg,int gr,int gb);
+
+map<des,int> m;
+
+int main() {
+	memset(dp,-1,sizeof(dp));
+	cin>>n>>RB>>RG>>BR>>BG>>GR>>GB;
+	int sum=0;
+	sum=(sum+calculate(1,red,0,0,0,0,0,0))%mod;
+	sum=(sum+calculate(1,green,0,0,0,0,0,0))%mod;
+	sum=(sum+calculate(1,blue,0,0,0,0,0,0))%mod;
+	cout<<sum<<endl;
+}
+
+int calculate(int index,int color,int rb,int rg,int br,int bg,int gr,int gb){
+	if(index==n)
+	return 1;
+	
+	if(dp[index][color][rb][rg][br][bg][gr][gb]!=-1)
+	return dp[index][color][rb][rg][br][bg][gr][gb];
+
+	int sum=0;
+	
+	if(color==red){
+		sum=(sum+calculate(index+1,red,rb,rg,br,bg,gr,gb))%mod;
+		if(rb<RB)
+		sum=(sum+calculate(index+1,blue,rb+1,rg,br,bg,gr,gb))%mod;
+		if(rg<RG)
+		sum=(sum+calculate(index+1,green,rb,rg+1,br,bg,gr,gb))%mod;
+	dp[index][color][rb][rg][br][bg][gr][gb]=sum;
+	return sum;
+	}
+
+	if(color==blue){
+		sum=(sum+calculate(index+1,blue,rb,rg,br,bg,gr,gb))%mod;
+		if(br<BR)
+		sum=(sum+calculate(index+1,red,rb,rg,br+1,bg,gr,gb))%mod;
+		if(bg<BG)
+		sum=(sum+calculate(index+1,green,rb,rg,br,bg+1,gr,gb))%mod;
+	dp[index][color][rb][rg][br][bg][gr][gb]=sum;
+		return sum;
+	}
+	if(color==green){
+		sum=(sum+calculate(index+1,green,rb,rg,br,bg,gr,gb))%mod;
+		if(gr<GR)
+		sum=(sum+calculate(index+1,red,rb,rg,br,bg,gr+1,gb))%mod;
+		if(gb<GB)
+		sum=(sum+calculate(index+1,blue,rb,rg,br,bg,gr,gb+1))%mod;
+		dp[index][color][rb][rg][br][bg][gr][gb]=sum;
+			return sum;
+	}
+	return 0;
+}
