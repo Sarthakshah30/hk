@@ -1,0 +1,140 @@
+#include <cmath>
+#include <cstdio>
+#include <queue>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+struct des{
+	int pass_no;
+	int id;
+	int time;
+	int floor;
+};
+
+struct com{
+	int arrival;
+	int trip_no;
+};
+
+int main() {
+   
+    int n,w,c,m;
+    cin>>n>>w>>c>>m;
+	queue<des> studwaitqueue;
+	queue<des> twaitqueue;
+	des p_des[n+1];
+	com completed[n+1];
+	queue<des> left;
+	queue<des> inlift;
+	
+	 
+	for(int i = 1 ; i<=n ;i++){
+		p_des[i].pass_no=i;
+		cin>>p_des[i].id>>p_des[i].time>>p_des[i].floor;
+		left.push(p_des[i]);
+		
+	}
+	
+	int currtime=0,tripno=0;
+	int maxfloor=0;
+	int finals=0;
+	
+	for(currtime = 1 ; left.size()>0 || studwaitqueue.size()>0 || twaitqueue.size()>0; currtime++){
+			
+		des d;
+		if(left.size()>0)
+		{
+			
+			d=left.front();
+			if(studwaitqueue.size()==0 && twaitqueue.size()==0){
+				if(d.time > currtime)
+				continue;
+			}
+		}
+		
+		int departuretime=currtime+w;
+		if(left.size()>0 && d.time<=currtime)
+		{
+			if(d.id==1)
+			studwaitqueue.push(d);
+			else
+			twaitqueue.push(d);		
+			left.pop();
+		}	
+
+		
+		for(int i = currtime+1 ; i<=departuretime && left.size()>0;i++){
+			d=left.front();
+			if(d.time > i)
+			continue;
+			if(d.id==2)
+			twaitqueue.push(d);
+			else
+			studwaitqueue.push(d);
+			left.pop();
+		}
+		
+
+		
+		currtime+=w;
+		int z=0;
+				maxfloor=0;
+		while(z<c &&twaitqueue.size()>0){
+			inlift.push(twaitqueue.front());
+				if(twaitqueue.front().floor>maxfloor)
+				maxfloor=twaitqueue.front().floor;
+				twaitqueue.pop();
+				z++;
+		}
+		
+		while(z<c &&studwaitqueue.size()>0)
+			{
+				inlift.push(studwaitqueue.front());
+				if(studwaitqueue.front().floor>maxfloor)
+				maxfloor=studwaitqueue.front().floor;
+				studwaitqueue.pop();
+				z++;
+			}
+
+
+		
+		++tripno;
+		int zad=inlift.size();
+		for(int i = 0 ; i < zad;i++){
+			d=inlift.front();
+			inlift.pop();
+			completed[d.pass_no].arrival=currtime+d.floor;
+			completed[d.pass_no].trip_no=tripno;
+			finals=currtime+d.floor;
+		}
+		
+		
+		
+		currtime+=maxfloor*2-1;
+
+		if(left.size()>0)
+		{
+			d=left.front();
+			while(left.size()>0 && d.time<=currtime)
+				{
+			if(d.id==2)
+			twaitqueue.push(d);
+			else
+			studwaitqueue.push(d);
+			left.pop();
+			if(d.floor>maxfloor)
+			maxfloor=d.floor;
+			if(left.size()>0)
+			d=left.front();
+			}
+		}	
+	}
+   	cout<<completed[m].trip_no<<" "<<finals<<endl;   
+    return 0;
+}
+
+//		cout<<currtime<<" xaxa"<<departuretime<<studwaitqueue.size()<<"   "<<d.pass_no<<endl;
+//  			cout<<d.pass_no<<" "<<currtime+d.floor<<" "<<tripno<<endl;
+//		cout<<studwaitqueue.size()<<" sasas"<<twaitqueue.size()<<" "<<left.size()<<" xa"<<inlift.size()<<endl;
